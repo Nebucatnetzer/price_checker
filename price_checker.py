@@ -67,3 +67,5 @@ while not budget.compare_prices(current_price):
     print ('[%s]' % ', '.join(map(str, current_price)))
     result = budget.compare_prices(current_price)
     time.sleep(60)
+else:
+    print (tui.url)
