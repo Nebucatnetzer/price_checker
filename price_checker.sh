@@ -1,4 +1,4 @@
 #!/bin/bash
 source bin/activate
-./price_checker.py
+python3 price_checker.py
 exit 0
