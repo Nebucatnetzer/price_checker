@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import requests
 import time
 import smtplib
+import os
 import configparser
 
 class Email(object):
@@ -82,7 +83,7 @@ class Configuration():
             self.sender_address = self.config['DEFAULT']['sender_address']
 
 
-config = Config()
+config = Configuration()
 email = Email()
 website = Website()
 price = Price()
