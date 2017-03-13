@@ -56,6 +56,7 @@ class Configuration():
                 self.smtp_server = ""
                 self.sender_address = ""
                 self.check_location()
+                self.smtp_port()
 
         def check_location(self):
             # setup the config parser
@@ -79,6 +80,8 @@ class Configuration():
             self.password = self.config['DEFAULT']['password']
             # assign the smtp_server variable
             self.smtp_server = self.config['DEFAULT']['smtp_server']
+            # assign the smtp_port variable
+            self.smtp_port = self.config['DEFAULT']['smtp_port']
             # assign the email_address variable
             self.sender_address = self.config['DEFAULT']['sender_address']
 
