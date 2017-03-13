@@ -5,4 +5,5 @@ reached it will send an email to a provided address.
 
 required packages:
 
-- libxml2-dev libxslt1-dev
+- python3
+- python3-pip
