@@ -8,6 +8,7 @@ import requests
 import time
 import smtplib
 import os
+import sys
 import configparser
 
 class Email(object):
@@ -51,12 +52,8 @@ class Price(object):
 
 class Configuration():
         def __init__ (self):
-                self.config = ""
-                self.password = ""
-                self.smtp_server = ""
-                self.sender_address = ""
                 self.check_location()
-                self.smtp_port()
+                self.apply_settings()
 
         def check_location(self):
             # setup the config parser
@@ -68,9 +65,9 @@ class Configuration():
             config_folder = ".config/price_checker/"
             config_path = os.path.join(home, config_folder, config_file)
             if os.path.isfile(config_path):
-                self.config.read(config_path)
+                return self.config.read(config_path)
             elif os.path.isfile(config_file):
-                self.config.read(config_file)
+                return self.config.read(config_file)
             else:
                 print("Configuration file not found.")
                 sys.exit(1)
@@ -86,26 +83,17 @@ class Configuration():
             self.sender_address = self.config['DEFAULT']['sender_address']
 
 
-config = Configuration()
+settings = Configuration()
 email = Email()
 website = Website()
 price = Price()
 
-config.apply_settings()
-
-email.prompt_for_recipient()
-website.prompt_for_url()
-price.prompt_for_amount()
-website.get_page()
-current_price = website.extract_price('//div[@class="product-price"]'
-                                              '/text()')
-
-while not budget.compare_prices(current_price):
-    website.get_page()
-    current_price = website.extract_price('//div[@class="product-price"]'
-                                              '/text()')
-    print ('[%s]' % ', '.join(map(str, current_price)))
-    result = price.compare_prices(current_price)
-    time.sleep(60)
-else:
-    print (tui.url)
+#while not budget.compare_prices(current_price):
+#    website.get_page()
+#    current_price = website.extract_price('//div[@class="product-price"]'
+#                                              '/text()')
+#    print ('[%s]' % ', '.join(map(str, current_price)))
+#    result = price.compare_prices(current_price)
+#    time.sleep(60)
+#else:
+#    print (tui.url)
