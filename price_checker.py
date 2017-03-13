@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # get user email -> get url -> get price
-#download website -> search for price -> compare price
-#if price = website.price -> send mail(user.mail, url)
+# download website -> search for price -> compare price
+# if price = website.price -> send mail(user.mail, url)
 
 from bs4 import BeautifulSoup
 import requests
@@ -11,14 +11,16 @@ import os
 import sys
 import configparser
 
+
 class Email(object):
 
-        def __init__ (self):
+        def __init__(self):
                 self.email = input("Please enter your email address:")
+
 
 class Website(object):
 
-        def __init__ (self):
+        def __init__(self):
                 self.url = input("Please enter the url you want to monitor:")
 
         def get_page(self):
@@ -29,26 +31,29 @@ class Website(object):
                 prices = self.tree.xpath(string)
                 return prices
 
+
 class Price(object):
 
-        def __init__ (self):
+        def __init__(self):
                 self.desired_price = input("Please enter the price "
-                                        "you're looking for:")
+                                           "you're looking for:")
 
         def compare(self, current_price):
-                if not self.desired_price in current_price:
+                if not self.desired_price >= current_price:
                         return False
 
+
 class Configuration():
-        def __init__ (self):
+
+        def __init__(self):
                 self.check_location()
                 self.apply_settings()
 
         def check_location(self):
             # setup the config parser
             self.config = configparser.ConfigParser()
-            # check whether the config file exists either in the home folder or
-            # next to the binary
+            # check whether the config file exists either in the home
+            # folder or next to the binary
             home = os.getenv('HOME')
             config_file = "price_checker.cfg"
             config_folder = ".config/price_checker/"
@@ -81,9 +86,9 @@ current_price = ""
 while not price.compare(current_price):
     website.get_page()
     current_price = website.extract_price('//div[@class="product-price"]'
-                                              '/text()')
-    print ('[%s]' % ', '.join(map(str, current_price)))
+                                          '/text()')
+    print('[%s]' % ', '.join(map(str, current_price)))
     result = price.compare(current_price)
     time.sleep(60)
 else:
-    print (tui.url)
+    print(website.url)
