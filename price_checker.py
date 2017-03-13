@@ -14,19 +14,11 @@ import configparser
 class Email(object):
 
         def __init__ (self):
-                self.email = ""
-
-        def prompt_for_recipient(self):
                 self.email = input("Please enter your email address:")
-                return self.email
 
 class Website(object):
 
         def __init__ (self):
-                self.url = ""
-                self.tree = ""
-
-        def prompt_for_url(self):
                 self.url = input("Please enter the url you want to monitor:")
 
         def get_page(self):
@@ -40,13 +32,10 @@ class Website(object):
 class Price(object):
 
         def __init__ (self):
-                self.desired_price = ""
-
-        def prompt_for_amount(self):
                 self.desired_price = input("Please enter the price "
                                         "you're looking for:")
 
-        def compare_prices(self, current_price):
+        def compare(self, current_price):
                 if not self.desired_price in current_price:
                         return False
 
@@ -87,13 +76,14 @@ settings = Configuration()
 email = Email()
 website = Website()
 price = Price()
+current_price = ""
 
-#while not budget.compare_prices(current_price):
-#    website.get_page()
-#    current_price = website.extract_price('//div[@class="product-price"]'
-#                                              '/text()')
-#    print ('[%s]' % ', '.join(map(str, current_price)))
-#    result = price.compare_prices(current_price)
-#    time.sleep(60)
-#else:
-#    print (tui.url)
+while not price.compare(current_price):
+    website.get_page()
+    current_price = website.extract_price('//div[@class="product-price"]'
+                                              '/text()')
+    print ('[%s]' % ', '.join(map(str, current_price)))
+    result = price.compare(current_price)
+    time.sleep(60)
+else:
+    print (tui.url)
