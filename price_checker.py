@@ -50,13 +50,16 @@ class Price(object):
 
 class Configuration():
         def __init__ (self):
+                self.password = ""
+                self.smtp_server = ""
+                self.email_address = ""
                 self.check_location()
 
         def check_location(self):
             # setup the config parser
             config = configparser.ConfigParser()
-            # check whether the config file exists either in the home folder or next to
-            # the binary
+            # check whether the config file exists either in the home folder or
+            # next to the binary
             home = os.getenv('HOME')
             config_file = "price_checker.cfg"
             config_folder = ".config/price_checker/"
@@ -68,25 +71,17 @@ class Configuration():
             else:
                 print("Configuration file not found.")
                 sys.exit(1)
-            # assign the repository variable depending whether it's a remote or a local
-            # repository
-            if 'server' in config['DEFAULT']:
-                repository = (config['DEFAULT']['user']
-                            + "@"
-                            + config['DEFAULT']['server']
-                            + ":"
-                            + config['DEFAULT']['repository_path'])
-                int_vars.server = config['DEFAULT']['server']
-            else:
-                repository = config['DEFAULT']['repository_path']
+
+        def apply_settings(self):
             # assign the password variable
-            password = config['DEFAULT']['password']
-            # set the environment variables
-            os.environ['BORG_REPO'] = repository
-            os.environ['BORG_PASSPHRASE'] = password
+            self.password = config['DEFAULT']['password']
+            # assign the smtp_server variable
+            self.password = config['DEFAULT']['smtp_server']
+            # assign the email_address variable
+            self.password = config['DEFAULT']['email_address']
 
 
-
+config = Config()
 email = Email()
 website = Website()
 price = Price()
