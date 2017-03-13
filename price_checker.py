@@ -14,7 +14,7 @@ class Email(object):
         def __init__ (self):
                 self.email = ""
 
-        def prompt_for_email(self):
+        def prompt_for_recipient(self):
                 self.email = input("Please enter your email address:")
                 return self.email
 
@@ -50,14 +50,15 @@ class Price(object):
 
 class Configuration():
         def __init__ (self):
+                self.config = ""
                 self.password = ""
                 self.smtp_server = ""
-                self.email_address = ""
+                self.sender_address = ""
                 self.check_location()
 
         def check_location(self):
             # setup the config parser
-            config = configparser.ConfigParser()
+            self.config = configparser.ConfigParser()
             # check whether the config file exists either in the home folder or
             # next to the binary
             home = os.getenv('HOME')
@@ -65,20 +66,20 @@ class Configuration():
             config_folder = ".config/price_checker/"
             config_path = os.path.join(home, config_folder, config_file)
             if os.path.isfile(config_path):
-                config.read(config_path)
+                self.config.read(config_path)
             elif os.path.isfile(config_file):
-                config.read(config_file)
+                self.config.read(config_file)
             else:
                 print("Configuration file not found.")
                 sys.exit(1)
 
         def apply_settings(self):
             # assign the password variable
-            self.password = config['DEFAULT']['password']
+            self.password = self.config['DEFAULT']['password']
             # assign the smtp_server variable
-            self.password = config['DEFAULT']['smtp_server']
+            self.smtp_server = self.config['DEFAULT']['smtp_server']
             # assign the email_address variable
-            self.password = config['DEFAULT']['email_address']
+            self.sender_address = self.config['DEFAULT']['sender_address']
 
 
 config = Config()
@@ -86,7 +87,9 @@ email = Email()
 website = Website()
 price = Price()
 
-email.prompt_for_email()
+config.apply_settings()
+
+email.prompt_for_recipient()
 website.prompt_for_url()
 price.prompt_for_amount()
 website.get_page()
