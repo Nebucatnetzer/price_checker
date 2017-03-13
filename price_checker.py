@@ -3,9 +3,11 @@
 #download website -> search for price -> compare price
 #if price = website.price -> send mail(user.mail, url)
 
-from lxml import html
+from bs4 import BeautifulSoup
 import requests
 import time
+import smtplib
+import configparser
 
 class User(object):
 
@@ -46,6 +48,39 @@ class Price(object):
                 if not self.desired_price in current_price:
                         return False
 
+class Configuration():
+    def check_location():
+        # setup the config parser
+        config = configparser.ConfigParser()
+        # check whether the config file exists either in the home folder or next to
+        # the binary
+        home = os.getenv('HOME')
+        config_file = "price_checker.cfg"
+        config_folder = ".config/price_checker/"
+        config_path = os.path.join(home, config_folder, config_file)
+        if os.path.isfile(config_path):
+            config.read(config_path)
+        elif os.path.isfile(config_file):
+            config.read(config_file)
+        else:
+            print("Configuration file not found.")
+            sys.exit(1)
+        # assign the repository variable depending whether it's a remote or a local
+        # repository
+        if 'server' in config['DEFAULT']:
+            repository = (config['DEFAULT']['user']
+                        + "@"
+                        + config['DEFAULT']['server']
+                        + ":"
+                        + config['DEFAULT']['repository_path'])
+            int_vars.server = config['DEFAULT']['server']
+        else:
+            repository = config['DEFAULT']['repository_path']
+        # assign the password variable
+        password = config['DEFAULT']['password']
+        # set the environment variables
+        os.environ['BORG_REPO'] = repository
+        os.environ['BORG_PASSPHRASE'] = password
 
 
 
