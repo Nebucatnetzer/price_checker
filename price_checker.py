@@ -10,6 +10,8 @@ import smtplib
 import os
 import sys
 import configparser
+import dryscrape
+import lxml
 
 
 class Email(object):
@@ -28,9 +30,11 @@ class Email(object):
                 message = "Subject: " + message
                 try:
                         self.server.sendmail(sender, self.recipient, message)
+                        self.server.quit()
                         print("Successfully sent email")
                 except SMTPException:
                         print("Error: unable to send email")
+                        self.server.quit()
 
 
 class Website(object):
@@ -39,11 +43,14 @@ class Website(object):
                 self.url = input("Please enter the url you want to monitor:")
 
         def get_page(self):
+                #session = dryscrape.Session()
+                #session.visit(self.url)
+                #page = session.body()
                 page = requests.get(self.url)
-                self.tree = html.fromstring(page.content)
+                self.soup = BeautifulSoup(page.text, "lxml")
 
-        def extract_price(self, string):
-                prices = self.tree.xpath(string)
+        def extract_price(self):
+                prices = self.soup.find_all("div", class_="product-price")
                 return prices
 
 
@@ -93,26 +100,23 @@ class Configuration():
 
 
 settings = Configuration()
-email = Email()
-#website = Website()
+#email = Email()
+website = Website()
 #price = Price()
-current_price = ""
-message = "Test"
+#current_price = ""
+#message = "Test"
 
-print(settings.password)
-print(settings.smtp_server)
-print(settings.smtp_port)
-print(settings.sender_address)
+website.get_page()
+print(website.extract_price())
 
-email.connecting(settings.smtp_server, settings.smtp_port)
-email.login(settings.sender_address, settings.password)
-email.sending(settings.sender_address, message)
 #while not price.compare(current_price):
-#    website.get_page()
-#    current_price = website.extract_price('//div[@class="product-price"]'
-#                                          '/text()')
-#    print('[%s]' % ', '.join(map(str, current_price)))
-#    result = price.compare(current_price)
-#    time.sleep(60)
+#        website.get_page()
+#        current_price = website.extract_price('//div[@class="product-price"]'
+#                                              '/text()')
+#        print('[%s]' % ', '.join(map(str, current_price)))
+#        result = price.compare(current_price)
+#        time.sleep(60)
 #else:
-#    print(website.url)
+#        email.connecting(settings.smtp_server, settings.smtp_port)
+#        email.login(settings.sender_address, settings.password)
+#        email.sending(settings.sender_address, message)
