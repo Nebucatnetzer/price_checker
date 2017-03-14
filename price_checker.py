@@ -12,6 +12,9 @@ import sys
 import configparser
 import dryscrape
 import lxml
+from datetime import datetime
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 
 class Email(object):
@@ -27,9 +30,14 @@ class Email(object):
         self.server.login(sender, password)
 
     def sending(self, sender, message):
-        message = "Subject: " + message
+        msg = MIMEMultipart()
+        msg['Subject'] = "Found a price match!"
+        msg['From'] = "Price Checker"
+        body = message
+        msg.attach(MIMEText(body, 'plain'))
+        text = msg.as_string()
         try:
-            self.server.sendmail(sender, self.recipient, message)
+            self.server.sendmail(sender, self.recipient, text)
             self.server.quit()
             print("Successfully sent email")
         except SMTPException:
@@ -44,23 +52,16 @@ class Website(object):
 
     def get_page(self):
         session = dryscrape.Session()
+        session.set_attribute('auto_load_images', False)
         session.visit(self.url)
         page = session.body()
         self.soup = BeautifulSoup(page, "lxml")
 
     def extract_price(self):
-        prices = self.soup.find_all("div", class_="product-price")
-        return prices
-
-
-class Price(object):
-
-    def __init__(self, price):
-        self.desired_price = price
-
-    def compare(self, current_price):
-        if not self.desired_price >= current_price:
-            return False
+        prices = [a.get_text() for
+                  a in self.soup.find_all("span", class_="amount ng-binding")]
+        lowest_price = min(int(s) for s in prices)
+        return int(lowest_price)
 
 
 class Configuration():
@@ -98,7 +99,7 @@ class Configuration():
         # assign the url variable
         self.url = self.config['DEFAULT']['url']
         # assign the price variable
-        self.price = self.config['DEFAULT']['price']
+        self.price = int(self.config['DEFAULT']['price'])
         # assign the recipient variable
         self.recipient_address = self.config['DEFAULT']['recipient_address']
 
@@ -106,15 +107,14 @@ class Configuration():
 settings = Configuration()
 email = Email(settings.recipient_address)
 website = Website(settings.url)
-current_price = ""
-price = Price(settings.price)
 
-while not price.compare(current_price):
+while True:
     website.get_page()
-    current_price = website.extract_price()
-    time.sleep(1)
-else:
-    message = "Subject: Found Price match!\n" + settings.url
-    email.connecting(settings.smtp_server, settings.smtp_port)
-    email.login(settings.sender_address, settings.password)
-    email.sending(settings.sender_address, message)
+    if website.extract_price() < settings.price:
+        email.connecting(settings.smtp_server, settings.smtp_port)
+        email.login(settings.sender_address, settings.password)
+        email.sending(settings.sender_address, settings.url)
+        sys.exit(0)
+    print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+    print("No Match yet")
+    time.sleep(10)
