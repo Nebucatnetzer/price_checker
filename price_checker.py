@@ -15,7 +15,22 @@ import configparser
 class Email(object):
 
         def __init__(self):
-                self.email = input("Please enter your email address:")
+                self.recipient = input("Please enter your email address:")
+
+        def connecting(self, smtp_server, smtp_port):
+                self.server = smtplib.SMTP_SSL(smtp_server, smtp_port)
+                self.server.ehlo()
+
+        def login(self, sender, password):
+                self.server.login(sender, password)
+
+        def sending(self, sender, message):
+                message = "Subject: " + message
+                try:
+                        self.server.sendmail(sender, self.recipient, message)
+                        print("Successfully sent email")
+                except SMTPException:
+                        print("Error: unable to send email")
 
 
 class Website(object):
@@ -79,16 +94,25 @@ class Configuration():
 
 settings = Configuration()
 email = Email()
-website = Website()
-price = Price()
+#website = Website()
+#price = Price()
 current_price = ""
+message = "Test"
 
-while not price.compare(current_price):
-    website.get_page()
-    current_price = website.extract_price('//div[@class="product-price"]'
-                                          '/text()')
-    print('[%s]' % ', '.join(map(str, current_price)))
-    result = price.compare(current_price)
-    time.sleep(60)
-else:
-    print(website.url)
+print(settings.password)
+print(settings.smtp_server)
+print(settings.smtp_port)
+print(settings.sender_address)
+
+email.connecting(settings.smtp_server, settings.smtp_port)
+email.login(settings.sender_address, settings.password)
+email.sending(settings.sender_address, message)
+#while not price.compare(current_price):
+#    website.get_page()
+#    current_price = website.extract_price('//div[@class="product-price"]'
+#                                          '/text()')
+#    print('[%s]' % ', '.join(map(str, current_price)))
+#    result = price.compare(current_price)
+#    time.sleep(60)
+#else:
+#    print(website.url)
