@@ -104,17 +104,16 @@ class Configuration():
         self.recipient_address = self.config['DEFAULT']['recipient_address']
 
 
+dryscrape.start_xvfb()
 settings = Configuration()
 email = Email(settings.recipient_address)
 website = Website(settings.url)
 
-while True:
-    website.get_page()
-    if website.extract_price() < settings.price:
-        email.connecting(settings.smtp_server, settings.smtp_port)
-        email.login(settings.sender_address, settings.password)
-        email.sending(settings.sender_address, settings.url)
-        sys.exit(0)
-    print(datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-    print("No Match yet")
-    time.sleep(10)
+website.get_page()
+if website.extract_price() < settings.price:
+    email.connecting(settings.smtp_server, settings.smtp_port)
+    email.login(settings.sender_address, settings.password)
+    email.sending(settings.sender_address, settings.url)
+    sys.exit(0)
+else:
+    sys.exit(0)
