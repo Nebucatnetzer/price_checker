@@ -55,13 +55,11 @@ class Website(object):
         session.set_attribute('auto_load_images', False)
         session.visit(self.url)
         page = session.body()
-        print(len(page))
         self.soup = BeautifulSoup(page, "lxml")
 
     def extract_price(self):
         prices = [a.get_text() for
                   a in self.soup.find_all("span", class_="amount ng-binding")]
-        print(len(prices))
         lowest_price = min(int(s) for s in prices)
         return int(lowest_price)
 
