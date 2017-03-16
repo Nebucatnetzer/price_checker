@@ -55,11 +55,13 @@ class Website(object):
         session.set_attribute('auto_load_images', False)
         session.visit(self.url)
         page = session.body()
+        print(len(page))
         self.soup = BeautifulSoup(page, "lxml")
 
     def extract_price(self):
         prices = [a.get_text() for
                   a in self.soup.find_all("span", class_="amount ng-binding")]
+        print(len(prices))
         lowest_price = min(int(s) for s in prices)
         return int(lowest_price)
 
@@ -107,13 +109,14 @@ class Configuration():
 dryscrape.start_xvfb()
 settings = Configuration()
 email = Email(settings.recipient_address)
-website = Website(settings.url)
 
-website.get_page()
-if website.extract_price() < settings.price:
-    email.connecting(settings.smtp_server, settings.smtp_port)
-    email.login(settings.sender_address, settings.password)
-    email.sending(settings.sender_address, settings.url)
-    sys.exit(0)
-else:
-    sys.exit(0)
+while True:
+    website = Website(settings.url)
+    website.get_page()
+    if website.extract_price() < settings.price:
+        email.connecting(settings.smtp_server, settings.smtp_port)
+        email.login(settings.sender_address, settings.password)
+        email.sending(settings.sender_address, settings.url)
+        sys.exit(0)
+    else:
+        print("No Match")
