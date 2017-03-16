@@ -54,6 +54,7 @@ class Website(object):
         session = dryscrape.Session()
         session.set_attribute('auto_load_images', False)
         session.visit(self.url)
+        print(session.status_code())
         page = session.body()
         self.soup = BeautifulSoup(page, "lxml")
 
@@ -118,3 +119,4 @@ while True:
         sys.exit(0)
     else:
         print("No Match")
+        time.sleep(10)
